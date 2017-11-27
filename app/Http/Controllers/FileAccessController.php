@@ -3,22 +3,45 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Storage;
+use App\Service\FileService;
+use App\Service\StringService;
 
 class FileAccessController extends Controller
 {
+    protected $fileService;
+
+    public function __construct(FileService $fileService)
+    {
+        $this->fileService = $fileService;
+    }
+
+
     public function open(){
-        // $path = "/Users/minion/laraProject/mailSanitizer";
-        $path = 'img';
 
-        var_dump(File::exsits($path));
+        $name = 'mail';
+        $fileExsists =  $this->fileService->exists($name);
 
-/*
-        if(File::exsits($path)){
-            echo "a";
+        if($fileExsists){
+            $contents = $this->fileService->open($name);
         } else {
-            echo "no";
+            dd("File Not Found.");
         }
-*/
+
+        $StringService = new StringService();
+        // タイトルの取得
+        $title = $StringService->findTitle($contents);
+        return $title;
+
+    }
+
+    public function move(){
+        // Storage::move('old/file1.jpg', 'new/file1.jpg');
+    }
+
+    public function write(){
+        Storage::disk('local')->put('file.txt','hello');
+
     }
 
 }
